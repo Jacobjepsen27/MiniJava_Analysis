@@ -211,6 +211,8 @@ public class TypeCheck extends IRElementVisitor<MJType> {
 
 	public MJType visitType(MJType e) throws VisitorException {
 		
+		if (e.isChar()) return MJType.getCharType();
+		if (e.isDouble()) return MJType.getDoubleType();
 		if (e.isBoolean()) return MJType.getBooleanType();
 		if (e.isInt()) return MJType.getIntType();
 		if (e.isVoid()) return MJType.getVoidType();
@@ -776,7 +778,8 @@ public class TypeCheck extends IRElementVisitor<MJType> {
 	}
 
 	public MJType visitExpression(MJChar e) throws VisitorException {
-		return null;
+		e.setType(MJType.getCharType());
+		return e.getType();	
 	}
 
 	public MJType visitExpression(MJDouble e) throws VisitorException {

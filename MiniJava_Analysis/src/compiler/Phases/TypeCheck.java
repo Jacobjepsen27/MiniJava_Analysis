@@ -674,7 +674,42 @@ public class TypeCheck extends IRElementVisitor<MJType> {
 	}
 
 	public MJType visitConstructor(MJConstructor e) throws VisitorException {
-		return null;
+		// remember which method we are in
+				IR.currentMethod = e;
+				
+				// Tjek navn vha. IR.currentclass
+				if (!e.getName().equals(IR.currentClass.getName())){
+					throw new TypeCheckerException("Constructor "+e.getName()+" has an invalid name "+IR.currentClass.getName());
+				}
+				
+				// tjek at der ikke er nogen retur-type på constructor
+				if (!e.getReturnType().isVoid()){
+					throw new TypeCheckerException("Constructor "+e.getName()+" has a return type "+e.getReturnType());
+				}
+
+				// we need a new scope for the parameters
+				IR.stack.enterScope();
+				
+				for (MJVariable par : e.getParameters()) {
+					
+					// each parameter is type checked
+					visitVariable(par);
+
+					// and added to the scope
+					try {
+						IR.stack.add(par);
+					} catch (VariableAlreadyDeclared exc) {
+						throw new TypeCheckerException("Constructor "+e.getName()+" has duplicate parameter "+par.getName());
+					}
+				}
+
+				// now we typecheck the body
+				visitStatement(e.getBody());
+
+				// and leave the scope
+				IR.stack.leaveScope();
+
+				return MJType.getVoidType();
 	}
 
 	public MJType visitStatement(MJTryBlock e) throws VisitorException {
@@ -683,7 +718,10 @@ public class TypeCheck extends IRElementVisitor<MJType> {
 
 	public MJType visitStatement(MJConstructorCallStmt e)
 			throws VisitorException {
-		return null;
+		for (MJExpression e1 : e.getMethodCallExpr().getArguments()){
+			visitExpression(e1);
+		}
+		return MJType.getVoidType();
 	}
 
 	public MJType visitStatement(MJFor e) throws VisitorException {
@@ -715,7 +753,18 @@ public class TypeCheck extends IRElementVisitor<MJType> {
 	}
 
 	public MJType visitExpression(MJGreater e) throws VisitorException {
-		return null;
+		MJType ltype = visitExpression(e.getLhs());
+		MJType rtype = visitExpression(e.getRhs());
+		
+		if (!ltype.isSame(rtype)) { 
+			throw new TypeCheckerException("Arguments to > must be of same type");
+		}
+		
+		if(!ltype.isInt()) {
+			throw new TypeCheckerException("Arguments to > must be of type int");
+		}
+		e.setType(MJType.getBooleanType());
+		return e.getType();
 	}
 
 	public MJType visitExpression(MJDivide e) throws VisitorException {

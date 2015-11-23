@@ -731,7 +731,8 @@ public class TypeCheck extends IRElementVisitor<MJType> {
 	}
 
 	public MJType visitExpression(MJDouble e) throws VisitorException {
-		return null;
+		e.setType(MJType.getDoubleType());
+		return e.getType();	
 	}
 
 	public MJType visitExpression(MJPostIncrementExpr e)

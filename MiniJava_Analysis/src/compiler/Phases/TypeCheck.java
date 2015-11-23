@@ -784,23 +784,55 @@ public class TypeCheck extends IRElementVisitor<MJType> {
 		return e.getType();	
 	}
 
-	public MJType visitExpression(MJPostIncrementExpr e)
-			throws VisitorException {
-		return null;
-	}
+	public MJType visitExpression(MJPostIncrementExpr e) throws VisitorException {
+		MJType type = visitExpression(e.getArgument());
+			
+			if(!type.isInt()) {
+				throw new TypeCheckerException("Arguments to ++ must be of type int");
+			}
+			
+			e.setType(type);
+			return e.getType();
+		}
+		
 
-	public MJType visitExpression(MJPreIncrementExpr e) throws VisitorException {
-		return null;
-	}
+		public MJType visitExpression(MJPreIncrementExpr e) throws VisitorException {
+		MJType type = visitExpression(e.getArgument());
+			
+			if(!type.isInt()) {
+				throw new TypeCheckerException("Arguments to ++ must be of type int");
+			}
+			
+			e.setType(type);
+			return e.getType();
+		}
+		
 
-	public MJType visitExpression(MJPostDecrementExpr e)
-			throws VisitorException {
-		return null;
-	}
+		public MJType visitExpression(MJPostDecrementExpr e) throws VisitorException{
+		
+			MJType type = visitExpression(e.getArgument());
+		
+		if(!type.isInt()) {
+			throw new TypeCheckerException("Arguments to -- must be of type int");
+		}
+		
+		e.setType(type);
+		return e.getType();
 
-	public MJType visitExpression(MJPreDecrementExpr e) throws VisitorException {
-		return null;
-	}
+		}
+
+		public MJType visitExpression(MJPreDecrementExpr e) throws VisitorException {
+			MJType type = visitExpression(e.getArgument());
+		
+		if(!type.isInt()) {
+			throw new TypeCheckerException("Arguments to -- must be of type int");
+		}
+		
+		e.setType(type);
+		return e.getType();
+
+		}
+
 
 	public MJType visitExpression(MJTernary e) throws VisitorException {
 		return null;
